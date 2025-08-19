@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Python Calculator</title>
+  <style>
+    body { font-family: Arial; text-align: center; margin: 20px; }
+    input, button { padding: 10px; margin: 5px; }
+    .calc { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Username"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button onclick="login()">Login</button>
+
+  <div id="calcArea" class="calc" style="display:none;">
+    <h2>Calculator</h2>
+    <input type="number" id="num1" placeholder="Enter number 1">
+    <input type="number" id="num2" placeholder="Enter number 2"><br>
+    <button onclick="calculate('add')">+</button>
+    <button onclick="calculate('sub')">-</button>
+    <button onclick="calculate('mul')">*</button>
+    <button onclick="calculate('div')">/</button>
+    <h3>Result: <span id="result">--</span></h3>
+  </div>
+
+  <script>
+    let token = null;
+
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+
+      fetch("https://your-backend.onrender.com/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({username: user, password: pass})
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.success){
+          token = data.token;
+          document.getElementById("calcArea").style.display = "block";
+        } else {
+          alert("Login failed!");
+        }
+      });
+    }
+
+    function calculate(op) {
+      const n1 = parseFloat(document.getElementById("num1").value);
+      const n2 = parseFloat(document.getElementById("num2").value);
+
+      fetch("https://your-backend.onrender.com/calc", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({num1: n1, num2: n2, op: op, token: token})
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("result").innerText = data.result;
+      });
+    }
+  </script>
+</body>
+</html>
