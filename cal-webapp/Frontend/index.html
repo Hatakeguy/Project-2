@@ -34,7 +34,7 @@
       const user = document.getElementById("username").value;
       const pass = document.getElementById("password").value;
 
-      fetch("https://your-backend.onrender.com/login", {
+      fetch("https://project-2-2mgd.onrender.com/", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({username: user, password: pass})
@@ -54,7 +54,7 @@
       const n1 = parseFloat(document.getElementById("num1").value);
       const n2 = parseFloat(document.getElementById("num2").value);
 
-      fetch("https://your-backend.onrender.com/calc", {
+      fetch("https://project-2-2mgd.onrender.com/", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({num1: n1, num2: n2, op: op, token: token})
@@ -67,3 +67,4 @@
   </script>
 </body>
 </html>
+
