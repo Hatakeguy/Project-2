@@ -28,46 +28,58 @@
   </div>
 
   <script>
-    const BACKEND_URL = "https://project-2-2mgd.onrender.com"; // same domain
+  const BACKEND_URL = "https://project-2-2mgd.onrender.com"; // Render backend URL
 
-    let token = null;
+  let token = null;
 
-    function login() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
+  function login() {
+    // Hardcoded login credentials for testing
+    const user = "admin";
+    const pass = "1234";
 
-      fetch(`${BACKEND_URL}/login`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({username: user, password: pass})
-      })
-      .then(res => res.json())
-      .then(data => {
-        if(data.success){
-          token = data.token;
-          document.getElementById("calcArea").style.display = "block";
-        } else {
-          alert("Login failed!");
-        }
-      });
-    }
+    fetch(`${BACKEND_URL}/login`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({username: user, password: pass})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        token = data.token;
+        document.getElementById("calcArea").style.display = "block";
+        alert("Login successful!");
+      } else {
+        alert("Login failed!");
+      }
+    })
+    .catch(err => {
+      console.error("Error connecting to backend:", err);
+      alert("Backend connection failed!");
+    });
+  }
 
-    function calculate(op) {
-      const n1 = parseFloat(document.getElementById("num1").value);
-      const n2 = parseFloat(document.getElementById("num2").value);
+  function calculate(op) {
+    const n1 = parseFloat(document.getElementById("num1").value);
+    const n2 = parseFloat(document.getElementById("num2").value);
 
-      fetch(`${BACKEND_URL}/calc`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({num1: n1, num2: n2, op: op, token: token})
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("result").innerText = data.result || data.error;
-      });
-    }
-  </script>
+    fetch(`${BACKEND_URL}/calc`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({num1: n1, num2: n2, op: op, token: token})
+    })
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById("result").innerText = data.result || data.error;
+    })
+    .catch(err => {
+      console.error("Error connecting to backend:", err);
+      document.getElementById("result").innerText = "Error!";
+    });
+  }
+</script>
+
 </body>
 </html>
+
 
 
