@@ -1,4 +1,4 @@
-import os  # Missing import
+import os
 from flask import Flask, request, jsonify
 import mysql.connector
 from flask_cors import CORS
@@ -16,24 +16,42 @@ db = mysql.connector.connect(
 cursor = db.cursor(dictionary=True)
 
 # Sessions dictionary to store active sessions
-sessions = {}  # Missing sessions dictionary
+sessions = {}
+
+@app.route("/signup", methods=["POST"])
+def signup():
+    data = request.get_json()
+    username = data.get("username")
+    password = data.get("password")
+    
+    # Basic validation
+    if not username or not password:
+        return jsonify({"success": False, "error": "Username and password required"})
+    
+    try:
+        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+        db.commit()
+        return jsonify({"success": True})
+    except mysql.connector.errors.IntegrityError:
+        return jsonify({"success": False, "error": "Username exists"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 @app.route("/login", methods=["POST"])
 def login():
     data = request.json
     username = data.get("username")
     password = data.get("password")
-    
-    # Fixed variable names (user → username, pw → password)
+   
     sql = "SELECT id, password FROM users WHERE username=%s"
     cursor.execute(sql, (username,))
     result = cursor.fetchone()
 
-    if result and result['password'] == password:  # Fixed dictionary access
-        token = f"token-{username}"  # Fixed variable name
-        sessions[token] = username  # Store session
+    if result and result['password'] == password:
+        token = f"token-{username}"
+        sessions[token] = username
         return jsonify({"success": True, "token": token})
-    return jsonify({"success": False})
+    return jsonify({"success": False, "error": "Invalid credentials"})
     
 @app.route("/calc", methods=["POST"])
 def calc():
@@ -41,7 +59,7 @@ def calc():
     token = data.get("token")
     
     # Check if token is valid in our sessions
-    if token not in sessions:  # Better session validation
+    if token not in sessions:
         return jsonify({"error": "Invalid token"})
     
     n1 = data.get("num1")
