@@ -28,13 +28,15 @@
   </div>
 
   <script>
+    const BACKEND_URL = ""; // same domain
+
     let token = null;
 
     function login() {
       const user = document.getElementById("username").value;
       const pass = document.getElementById("password").value;
 
-      fetch("https://project-2-2mgd.onrender.com/", {
+      fetch(`${BACKEND_URL}/login`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({username: user, password: pass})
@@ -54,14 +56,14 @@
       const n1 = parseFloat(document.getElementById("num1").value);
       const n2 = parseFloat(document.getElementById("num2").value);
 
-      fetch("https://project-2-2mgd.onrender.com/", {
+      fetch(`${BACKEND_URL}/calc`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({num1: n1, num2: n2, op: op, token: token})
       })
       .then(res => res.json())
       .then(data => {
-        document.getElementById("result").innerText = data.result;
+        document.getElementById("result").innerText = data.result || data.error;
       });
     }
   </script>
