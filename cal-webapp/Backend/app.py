@@ -1,19 +1,20 @@
 import os
 from flask import Flask, request, jsonify
-import mysql.connector
+import psycopg2
+from urllib.parse import urlparse
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)  # Allow all origins
 
-# Connect to MySQL
-db = mysql.connector.connect(
-    host=os.environ.get("DB_HOST", "localhost"),
-    user=os.environ.get("DB_USER", "root"),
-    password=os.environ.get("DB_PASS", "YOUR_PASSWORD"),
-    database=os.environ.get("DB_NAME", "project2_db")
+
+cursor = db.cursor(dictionary=True) db = psycopg2.connect(
+    host="dpg-d2immg6mcj7s73cj2ii0-a",  # From your Render DB settings
+    database="cal_webapp_db",         # From your Render DB settings
+    user="cal_webapp_db_user",                  # From your Render DB settings
+    password="Onw8wxtwde33nnw1XXrKWg1RDX2G4vvS",              # From your Render DB settings
+    port="5432"                # Probably 5432
 )
-cursor = db.cursor(dictionary=True)
 
 # Sessions dictionary to store active sessions
 sessions = {}
@@ -93,3 +94,4 @@ def calc():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
