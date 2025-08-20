@@ -1,12 +1,16 @@
 import os
 from flask import Flask, request, jsonify
-import psycopg2
+import psycopg2 import RealDictCursor
 from urllib.parse import urlparse
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)  # Allow all origins
 
+# Get database URL from environment
+database_url = os.environ.get('postgresql://cal_webapp_db_user:Onw8wxtwde33nnw1XXrKWg1RDX2G4vvS@dpg-d2immg6mcj7s73cj2ii0-a/cal_webapp_db')
+or os.environ.get('postgresql://cal_webapp_db_user:Onw8wxtwde33nnw1XXrKWg1RDX2G4vvS@dpg-d2immg6mcj7s73cj2ii0-a.oregon-postgres.render.com/cal_webapp_db')
+url = urlparse(database_url) 
 
 cursor = db.cursor(dictionary=True) db = psycopg2.connect(
     host="dpg-d2immg6mcj7s73cj2ii0-a",  # From your Render DB settings
@@ -94,4 +98,5 @@ def calc():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
 
