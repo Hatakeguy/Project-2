@@ -1,24 +1,28 @@
 import os
 from flask import Flask, request, jsonify
-import psycopg2 import RealDictCursor
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from urllib.parse import urlparse
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)  # Allow all origins
 
-# Get database URL from environment
-database_url = os.environ.get('postgresql://cal_webapp_db_user:Onw8wxtwde33nnw1XXrKWg1RDX2G4vvS@dpg-d2immg6mcj7s73cj2ii0-a/cal_webapp_db')
-or os.environ.get('postgresql://cal_webapp_db_user:Onw8wxtwde33nnw1XXrKWg1RDX2G4vvS@dpg-d2immg6mcj7s73cj2ii0-a.oregon-postgres.render.com/cal_webapp_db')
+# Get database URL from environment (use the internal URL for better performance)
+database_url = os.environ.get('DATABASE_URL', 'postgresql://cal_webapp_db_user:Onw8wxtwde33nnw1XXrKWg1RDX2G4vvS@dpg-d2immg6mcj7s73cj2ii0-a/cal_webapp_db')
 url = urlparse(database_url) 
 
-cursor = db.cursor(dictionary=True) db = psycopg2.connect(
-    host="dpg-d2immg6mcj7s73cj2ii0-a",  # From your Render DB settings
-    database="cal_webapp_db",         # From your Render DB settings
-    user="cal_webapp_db_user",                  # From your Render DB settings
-    password="Onw8wxtwde33nnw1XXrKWg1RDX2G4vvS",              # From your Render DB settings
-    port="5432"                # Probably 5432
+# Establish database connection
+db = psycopg2.connect(
+    host=url.hostname,
+    database=url.path[1:],  # Remove leading slash
+    user=url.username,
+    password=url.password,
+    port=url.port
 )
+
+# Create cursor with dictionary results
+cursor = db.cursor(cursor_factory=RealDictCursor)
 
 # Sessions dictionary to store active sessions
 sessions = {}
@@ -37,14 +41,14 @@ def signup():
         cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
         db.commit()
         return jsonify({"success": True})
-    except mysql.connector.errors.IntegrityError:
+    except psycopg2.IntegrityError:
         return jsonify({"success": False, "error": "Username exists"})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 
 @app.route("/login", methods=["POST"])
 def login():
-    data = request.json
+    data = request.get_json()
     username = data.get("username")
     password = data.get("password")
    
@@ -60,7 +64,7 @@ def login():
     
 @app.route("/calc", methods=["POST"])
 def calc():
-    data = request.json
+    data = request.get_json()
     token = data.get("token")
     
     # Check if token is valid in our sessions
@@ -98,5 +102,3 @@ def calc():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
-
-
